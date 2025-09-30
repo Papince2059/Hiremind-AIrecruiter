@@ -126,21 +126,29 @@ function InterviewDetailsPage() {
         <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl w-full">
           <h2 className="text-xl font-medium text-gray-700 mb-4">Details</h2>
           <p className="text-gray-600">
-            <strong>Job Role:</strong> {interview.jobTitle || "N/A"}
+            <strong>Job Role:</strong> {interview.job_title || interview.jobTitle || "N/A"}
           </p>
           <p className="text-gray-600">
-            <strong>Candidate Name:</strong> {interview.userName || "N/A"}
+            <strong>Candidate Name:</strong> {interview.candidate_name || interview.userName || "N/A"}
           </p>
           <p className="text-gray-600">
             <strong>Duration:</strong> {interview.duration || "N/A"} Min
           </p>
           <p className="text-gray-600">
-            <strong>Interview Type:</strong> {interview.interviewType || "N/A"}
+            <strong>Interview Type:</strong> {interview.interview_type || interview.interviewType || "N/A"}
+          </p>
+          <p className="text-gray-600">
+            <strong>Interview ID:</strong> {interview.id}
           </p>
           <p className="text-gray-600">
             <strong>Created Date:</strong>{" "}
-            {new Date(interview.createdAt || Date.now()).toLocaleDateString()}
+            {new Date(interview.created_at || interview.createdAt || Date.now()).toLocaleDateString()}
           </p>
+          {interview.feedback && (
+            <p className="text-gray-600">
+              <strong>Status:</strong> <span className="text-green-600 font-medium">Analysis Complete</span>
+            </p>
+          )}
 
           <h2 className="text-xl font-medium text-gray-700 mt-6 mb-2">
             Questions

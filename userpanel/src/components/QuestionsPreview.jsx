@@ -2,7 +2,6 @@
 import React from "react";
 
 const QuestionsPreview = ({ interviewData, questions, onBack, onConfirm }) => {
-  console.log("Questions Prop:", questions); // Debug to confirm the prop
 
   return (
     <div className="max-w-3xl bg-white p-6 rounded-xl shadow space-y-6">

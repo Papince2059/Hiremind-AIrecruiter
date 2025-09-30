@@ -32,9 +32,13 @@ function InterviewRoom() {
   const [feedback, setFeedback] = useState(null);
 
   useEffect(() => {
+    console.log("InterviewRoom useEffect triggered");
+    console.log("Location state:", location.state);
+    console.log("Interview ID:", id);
+    
     setIsLoading(true);
-    const initialInfo = location.state?.interviewInfo;
-    if (initialInfo) {
+    const initialInfo = location.state?.interviewInfo || location.state;
+    if (initialInfo && initialInfo.interviewData) {
       console.log("Using navigation state interviewInfo:", initialInfo);
       setUserName(initialInfo.userName || userName);
       setQuestions(initialInfo.interviewData.questionList || []);
@@ -54,30 +58,45 @@ function InterviewRoom() {
         })
         .then((data) => {
           console.log("API Response in InterviewRoom:", data);
-          const parsedQuestions = [
-            data.questions?.question?.map((q) => q.text).filter((q) => q) || [],
-            data.questions
-              ?.split("\n")
-              .map((q) => q.trim())
-              .filter((q) => q) || [],
-          ]
-            .flat()
-            .slice(0, 5) || [
-            "What SpringBoot is and its main benefits?",
-            "Describe your Spring Boot experience.",
-            "Explain Spring Boot auto-configuration.",
-          ];
+          
+          // Better question parsing
+          let parsedQuestions = [];
+          try {
+            if (data.questions) {
+              const questionsData = JSON.parse(data.questions);
+              if (questionsData.question && Array.isArray(questionsData.question)) {
+                parsedQuestions = questionsData.question.map(q => q.text || q.question || q).filter(q => q);
+              }
+            }
+          } catch (e) {
+            console.log("Could not parse questions JSON, using fallback");
+          }
+          
+          // Fallback questions if parsing failed
+          if (parsedQuestions.length === 0) {
+            parsedQuestions = [
+              `What is your experience with ${data.job_title || data.jobTitle || 'this role'}?`,
+              `Describe a challenging project you worked on related to ${data.job_title || data.jobTitle || 'this field'}.`,
+              `How do you stay updated with the latest trends in ${data.job_title || data.jobTitle || 'this field'}?`,
+              `What tools and technologies do you use for ${data.job_title || data.jobTitle || 'this role'}?`,
+              `Tell me about a time you had to learn a new technology.`
+            ];
+          }
+          
+          console.log("Final parsed questions:", parsedQuestions);
           setQuestions(parsedQuestions);
-          setJobTitle(data.jobTitle || "Interview");
+          setJobTitle(data.job_title || data.jobTitle || "Interview");
           setDuration(data.duration || "15 Min");
           setIsLoading(false);
         })
         .catch((err) => {
           console.error("Error fetching interview data:", err.message);
           setQuestions([
-            "What SpringBoot is and its main benefits?",
-            "Describe your Spring Boot experience.",
-            "Explain Spring Boot auto-configuration.",
+            `What is your experience with ${jobTitle}?`,
+            `Describe a challenging project you worked on.`,
+            `How do you stay updated with the latest trends?`,
+            `What tools and technologies do you use?`,
+            `Tell me about a time you had to learn a new technology.`
           ]);
           setIsLoading(false);
         });
@@ -133,18 +152,53 @@ function InterviewRoom() {
       }
     });
 
-    vapi.on("error", (error) => console.error("Vapi error:", error));
+    vapi.on("error", (error) => {
+      console.error("Vapi error:", error);
+      if (error.message && error.message.includes("Invalid Key")) {
+        toast.error("Voice service API key is invalid. Please contact support.");
+      } else if (error.message && error.message.includes("Unauthorized")) {
+        toast.error("Voice service authentication failed. Please contact support.");
+      } else {
+        toast.error(`Voice service error: ${error.message || 'Unknown error'}`);
+      }
+    });
 
     return () => clearInterval(timer);
   }, [id, location.state, userName]);
 
-  const startInterview = () => {
+  const startInterview = async () => {
+    console.log("Start interview clicked!");
+    console.log("Vapi ref:", vapiRef.current);
+    console.log("Is interview started:", isInterviewStarted);
+    console.log("Questions:", questions);
+    
     if (vapiRef.current && !isInterviewStarted) {
       if (questions.length === 0) {
         console.error("Cannot start interview: No questions available");
         toast.error("No questions available.");
         return;
       }
+
+      // Check microphone permission first
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log("Microphone access granted");
+        stream.getTracks().forEach(track => track.stop()); // Stop the test stream
+        toast.success("Microphone access confirmed!");
+      } catch (error) {
+        console.error("Microphone access denied:", error);
+        toast.error("Microphone access is required for the interview. Please allow microphone access and try again.");
+        return;
+      }
+
+      // Add fallback questions if none available
+      const finalQuestions = questions.length > 0 ? questions : [
+        `What is your experience with ${jobTitle}?`,
+        `Describe a challenging project you worked on.`,
+        `How do you stay updated with the latest trends?`,
+        `What tools and technologies do you use?`,
+        `Tell me about a time you had to learn a new technology.`
+      ];
 
       const assistantOptions = {
         name: "AI Recruiter",
@@ -162,26 +216,54 @@ function InterviewRoom() {
             {
               role: "system",
               content: `
-            You are an AI voice assistant conducting interviews.
-            Begin with a friendly introduction. Ask one question at a time from: ${questions
-              .map((q, i) => `${i + 1}. ${q}`)
+            You are an AI voice assistant conducting interviews for a ${jobTitle} position.
+            Begin with a friendly introduction. Ask one question at a time from: ${finalQuestions
+              .map((q, i) => `${i + 1}. ${typeof q === 'string' ? q : q.text || q.question || 'No question text'}`)
               .join("\n")}.
             Offer hints if needed, provide feedback, and wrap up after 5-7 questions.
-            Keep it natural, engaging, and focused on Spring Boot.
+            Keep it natural, engaging, and focused on ${jobTitle}.
           `.trim(),
             },
           ],
         },
       };
 
+      console.log("Questions being used in interview:", finalQuestions);
+      console.log("Job title:", jobTitle);
       console.log(
         "Assistant Options with questions:",
         JSON.stringify(assistantOptions, null, 2)
       );
+      
+      // Add error handling and user feedback
+      toast.info("Starting interview... Connecting to voice service...");
+      
       vapiRef.current.start(assistantOptions).catch((error) => {
         console.error("Vapi start error:", error);
-        toast.error("Failed to start interview.");
+        
+        // Check for specific error types
+        if (error.message && error.message.includes("Invalid Key")) {
+          toast.error("Voice service configuration issue. The voice service API key is invalid. Please contact support.");
+        } else if (error.message && error.message.includes("Unauthorized")) {
+          toast.error("Voice service authentication failed. Please contact support.");
+        } else if (error.message && error.message.includes("Permission")) {
+          toast.error("Microphone permission denied. Please allow microphone access and try again.");
+        } else {
+          toast.error(`Failed to start interview: ${error.message || 'Unknown error'}`);
+        }
+        
+        // Show additional help
+        setTimeout(() => {
+          toast.info("Tip: Check browser console for detailed error information.");
+        }, 2000);
       });
+    } else {
+      console.error("Cannot start interview:", {
+        vapiRef: !!vapiRef.current,
+        isInterviewStarted,
+        questions: questions.length
+      });
+      toast.error("Cannot start interview. Please check your microphone permissions.");
     }
   };
 
@@ -204,7 +286,16 @@ function InterviewRoom() {
     } else {
       console.warn("No conversation data available for feedback.");
       toast.warn("No conversation data to generate feedback.");
-      navigate("/completed"); // Navigate to /completed even if no conversation
+      navigate("/completed", {
+        state: {
+          interviewData: {
+            id: id,
+            jobTitle: jobTitle,
+            userName: userName,
+            duration: time
+          }
+        }
+      });
     }
   };
 
@@ -232,12 +323,31 @@ function InterviewRoom() {
       .then((data) => {
         setFeedback(data.feedback);
         toast.success("Feedback submitted!");
-        navigate("/completed"); // Navigate to /completed instead of /interview/feedback
+        navigate("/completed", {
+          state: {
+            interviewData: {
+              id: id,
+              jobTitle: jobTitle,
+              userName: userName,
+              duration: time,
+              feedback: data.feedback
+            }
+          }
+        });
       })
       .catch((err) => {
         console.error("Error submitting feedback:", err.message);
         toast.error("Failed to submit feedback.");
-        navigate("/completed"); // Navigate to /completed even on error
+        navigate("/completed", {
+          state: {
+            interviewData: {
+              id: id,
+              jobTitle: jobTitle,
+              userName: userName,
+              duration: time
+            }
+          }
+        });
       });
   };
 
@@ -323,6 +433,28 @@ function InterviewRoom() {
               </button>
             </AlertConfirmation>
           )}
+        </div>
+        
+        {/* Debug Information */}
+        <div className="mt-4 p-4 bg-gray-50 rounded-lg text-sm">
+          <p><strong>Debug Info:</strong></p>
+          <p>Questions loaded: {questions.length}</p>
+          <p>Job Title: {jobTitle}</p>
+          <p>User Name: {userName}</p>
+          <p>Vapi Ready: {vapiRef.current ? 'Yes' : 'No'}</p>
+          <p>Interview Started: {isInterviewStarted ? 'Yes' : 'No'}</p>
+          <p>Microphone Permission: {navigator.permissions ? 'Check console' : 'Not available'}</p>
+          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+            <p className="text-xs text-yellow-800">
+              <strong>Note:</strong> If the interview doesn't start, check the browser console for errors. 
+              The voice service may require a valid API key. Microphone permission is required.
+            </p>
+          </div>
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+            <p className="text-xs text-red-800">
+              <strong>Known Issue:</strong> The Vapi API key is invalid. Voice interviews won't work until a valid key is provided.
+            </p>
+          </div>
         </div>
 
         <p className="text-sm text-gray-500 mt-2">

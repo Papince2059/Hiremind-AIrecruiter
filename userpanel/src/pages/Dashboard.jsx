@@ -10,22 +10,28 @@ const Dashboard = () => {
   const [interviews, setInterviews] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/user", { withCredentials: true })
-      .then((res) => setUser(res.data))
-      .catch(() => {
-        setUser(null);
-        window.location.href = "/login";
-      });
+    // Check if user is authenticated via localStorage
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuthenticated) {
+      window.location.href = "/login";
+      return;
+    }
 
-    // fetch interviews
+    // Set mock user data for demo
+    setUser({
+      name: "Test User",
+      email: "test@example.com",
+      provider: localStorage.getItem('userProvider') || 'google'
+    });
+
+    // Try to fetch interviews from backend
     axios
       .get("http://localhost:8080/api/interviews/my", { withCredentials: true })
       .then((res) => setInterviews(res.data))
       .catch(() => setInterviews([]));
   }, []);
 
-  if (!user) return <div className="p-4">Loading...</div>;
+  if (!user) return <div className="p-4">Loading dashboard...</div>;
 
   return (
     <div className="flex bg-gray-100 min-h-screen">
@@ -62,12 +68,16 @@ const Dashboard = () => {
         </section>
 
         <div className="mt-10">
-          <a
-            href="http://localhost:8080/logout"
+          <button
+            onClick={() => {
+              localStorage.removeItem('isAuthenticated');
+              localStorage.removeItem('userProvider');
+              window.location.href = '/login';
+            }}
             className="inline-block text-sm text-red-600 hover:underline"
           >
             Logout
-          </a>
+          </button>
         </div>
       </main>
     </div>

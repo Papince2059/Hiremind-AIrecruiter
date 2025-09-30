@@ -33,7 +33,7 @@ const InterviewForm = ({
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/interviews",
+        "http://localhost:8080/api/interviews/create-with-questions",
         {
           jobTitle: form.jobTitle,
           description: form.description,
@@ -48,12 +48,24 @@ const InterviewForm = ({
 
       let parsedQuestions;
       try {
-        const questionsString = questions.join("");
-        const questionsJson = JSON.parse(questionsString);
+        if (!questions) {
+          throw new Error("No questions received from API");
+        }
+        
+        if (!questions.trim()) {
+          throw new Error("Empty questions string");
+        }
+        
+        const questionsJson = JSON.parse(questions);
+        
+        if (!questionsJson.question || !Array.isArray(questionsJson.question)) {
+          throw new Error("Invalid questions format - expected array in 'question' field");
+        }
+        
         parsedQuestions = questionsJson.question;
       } catch (parseError) {
         console.error("Error parsing questions:", parseError);
-        throw new Error("Failed to parse questions from API response");
+        throw new Error(`Failed to parse questions from API response: ${parseError.message}`);
       }
 
       onSuccess({ interviewData, questions: parsedQuestions });

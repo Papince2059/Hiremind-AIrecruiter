@@ -6,20 +6,13 @@ const PrivateRoute = ({ element }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/user", {
-      credentials: "include",
-    })
-      .then((res) => {
-        setIsAuthenticated(res.ok);
-        setLoading(false);
-      })
-      .catch(() => {
-        setIsAuthenticated(false);
-        setLoading(false);
-      });
+    // Simple localStorage check for demo authentication
+    const isLoggedIn = localStorage.getItem('isAuthenticated') === 'true';
+    setIsAuthenticated(isLoggedIn);
+    setLoading(false);
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
 
   return isAuthenticated ? element : <Navigate to="/login" />;
 };

@@ -1,0 +1,12 @@
+# Minimal requirements to get the backend running
+fastapi
+uvicorn[standard]
+python-multipart
+sqlalchemy
+psycopg2-binary
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+httpx
+openai
+requests

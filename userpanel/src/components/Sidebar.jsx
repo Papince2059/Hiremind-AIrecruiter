@@ -6,7 +6,7 @@ const Sidebar = () => {
   return (
     <aside className="w-64 bg-white p-6 shadow-lg min-h-screen">
       <Link to="/dashboard">
-        <h2 className="text-2xl font-bold text-blue-600 mb-8">Voicruiter</h2>
+        <h2 className="text-2xl font-bold text-blue-600 mb-8">Hiremind</h2>
       </Link>
 
       <a

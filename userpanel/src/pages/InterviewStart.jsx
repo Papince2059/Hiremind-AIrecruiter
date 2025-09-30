@@ -5,7 +5,7 @@ import {
   useLocation,
   useSearchParams,
 } from "react-router-dom";
-import photo from "../assets/Voicruit_1.png";
+import photo from "../assets/Hiremind.png";
 
 const InterviewStart = () => {
   const { id } = useParams();

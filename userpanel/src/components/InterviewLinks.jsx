@@ -21,12 +21,22 @@ const InterviewLinks = ({ interviews }) => {
         >
           <div>
             <p className="text-blue-600 font-medium mb-1">
-              {interview.jobTitle}
+              {interview.job_title || interview.jobTitle}
+            </p>
+            <p className="text-gray-600 text-sm">
+              Candidate: {interview.candidate_name || interview.userName || 'N/A'}
             </p>
             <p className="text-gray-500 text-sm">{interview.duration} Min</p>
             <p className="text-gray-400 text-xs mt-2">
-              {new Date(interview.createdAt || Date.now()).toLocaleDateString()}
+              {new Date(interview.created_at || interview.createdAt || Date.now()).toLocaleDateString()}
             </p>
+            {interview.feedback && (
+              <div className="mt-2">
+                <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                  Analysis Complete
+                </span>
+              </div>
+            )}
           </div>
           <div className="mt-4 flex gap-2">
             <button
