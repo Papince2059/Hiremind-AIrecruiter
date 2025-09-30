@@ -401,16 +401,16 @@ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:8080/api/intervi
 
 ## 📸 Screenshots
 
-<img width="1896" height="870" alt="Dashboard" src="https://github.com/user-attachments/assets/5b4b01f6-210b-4d36-8a97-dcdc0c39a538" />
-<img width="1899" height="823" alt="Create Interview" src="https://github.com/user-attachments/assets/77769e12-4be5-45f8-ae67-c4247a15e62b" />
-<img width="1912" height="871" alt="Interview Room" src="https://github.com/user-attachments/assets/6c3fd27b-7530-4566-9c14-378d2fee61ef" />
-<img width="618" height="729" alt="Screenshot 2025-09-30 172746" src="https://github.com/user-attachments/assets/c8706eef-9990-40d8-a53d-0dbdeeccea08" />
-<img width="1902" height="782" alt="Screenshot 2025-09-30 172736" src="https://github.com/user-attachments/assets/8f1c4155-a537-4747-a271-ae7e4675b2eb" />
-<img width="1910" height="658" alt="Screenshot 2025-09-30 172707" src="https://github.com/user-attachments/assets/a0c5fa92-3a21-4ed3-9aa6-f8bda765c168" />
-<img width="1900" height="828" alt="Screenshot 2025-09-30 172656" src="https://github.com/user-attachments/assets/3b4211b5-4867-4ae5-9689-061e6f638139" />
-<img width="1891" height="840" alt="Screenshot 2025-09-30 172445" src="https://github.com/user-attachments/assets/7a4eaac5-cb1e-4756-a9fa-e6aca3669460" />
-<img width="1897" height="844" alt="Screenshot 2025-09-30 171936" src="https://github.com/user-attachments/assets/b540c9ba-7885-4fcc-9dde-1090018146cc" />
-<img width="1869" height="843" alt="Screenshot 2025-09-30 171922" src="https://github.com/user-attachments/assets/2ff21836-8af9-417f-a3c4-b25d3cae49e5" />
+<img width="618" height="729" alt="Screenshot 2025-09-30 172746" src="https://github.com/user-attachments/assets/aecb62b7-0835-42c5-8c04-b2fd3ddeac57" />
+<img width="1902" height="782" alt="Screenshot 2025-09-30 172736" src="https://github.com/user-attachments/assets/c0a4deff-51ea-4f47-9ab2-2ac145bb0f60" />
+<img width="1910" height="658" alt="Screenshot 2025-09-30 172707" src="https://github.com/user-attachments/assets/c82af964-2589-4cb7-bae5-3170f2371833" />
+<img width="1900" height="828" alt="Screenshot 2025-09-30 172656" src="https://github.com/user-attachments/assets/0830ebd9-0e77-4907-a368-13097d965df8" />
+<img width="1891" height="840" alt="Screenshot 2025-09-30 172445" src="https://github.com/user-attachments/assets/52cb390e-f131-4a4d-8684-dd0a798dea99" />
+<img width="1897" height="844" alt="Screenshot 2025-09-30 171936" src="https://github.com/user-attachments/assets/2b6132d9-5990-49c4-9d9a-1126d9b7c5c9" />
+<img width="1869" height="843" alt="Screenshot 2025-09-30 171922" src="https://github.com/user-attachments/assets/ff440b68-c94e-4248-8f3b-a3b88ff0ac75" />
+<img width="1868" height="829" alt="Screenshot 2025-09-30 171906" src="https://github.com/user-attachments/assets/b9a3f2e3-db69-4a89-82a0-8e8f6fe37cae" />
+<img width="1918" height="791" alt="Screenshot 2025-09-30 171638" src="https://github.com/user-attachments/assets/075fef29-dede-40d1-b3b0-6cc1b70f2012" />
+
 
 
 ## 🤝 Contributing
