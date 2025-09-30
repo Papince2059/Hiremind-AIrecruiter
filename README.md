@@ -419,7 +419,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📬 Contact
 
-[Harshit Tagaram](https://github.com/harshittagaram)
+[Papince Kumar Gupta](https://github.com/Papince2059)
 
 ## 🙏 Acknowledgments
 
@@ -427,3 +427,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Vapi AI** for voice interview capabilities
 - **FastAPI** for the robust backend framework
 - **React** for the modern frontend framework
+
+
+
+
+
+
+
